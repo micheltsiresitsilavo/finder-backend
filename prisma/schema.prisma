@@ -1,0 +1,149 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+//Model User
+model User {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  password    String
+  name        String
+  lastName    String?
+  contact     String?
+  location    String
+  status      String
+  bio         String?
+  viewers     Recrutor[] @relation("viewer")
+  avatar      Avatar?
+  social Social[]
+  area Area[]
+  skills Skills[]
+  portfolio Portfolio[]
+  language LangKnowledge[]
+  formation Formation[]
+  collaborator Recrutor[]
+  photo Photo[]
+  post Post[]
+
+}
+// Avatar
+model Avatar {
+  id String @default(cuid()) @id
+  publicId String @unique
+  format String
+  version String
+  owner User?  @relation(fields: [ownerId], references: [id])
+  ownerId Int @unique
+
+}
+
+//Domaine
+model Area {
+  id Int @id @default(autoincrement())
+  area String
+  experience String?
+ user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Skills {
+  id Int @id @default(autoincrement())
+  description String
+  tools String?
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Portfolio {
+  id Int @id @default(autoincrement())
+  description String
+  link String?
+  gitrepo String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model LangKnowledge {
+  id Int @id @default(autoincrement())
+  language String
+  level String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Formation {
+  id Int @id @default(autoincrement())
+  school String
+  yearsStudy String?
+  degree String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+}
+
+model Social {
+  id Int @id @default(autoincrement())
+  social String
+  link String
+  user User @relation(fields: [userId], references: [id])
+  userId Int
+
+  recrutor Recrutor @relation(fields: [recrutorId], references: [id])
+  recrutorId Int
+
+}
+
+
+//Recrutor and his job
+model Recrutor {
+  id Int @id @default(autoincrement())
+  email String @unique
+  password String
+  name String @unique
+  location String
+  bio String
+  status String
+  // avatar Avatar?
+  social Social[]
+  // areaJob Area[]
+  job Job[]
+  clientCollaborator User[]
+  view User? @relation("viewer", fields: [viewId], references: [id])
+  viewId Int? 
+}
+
+model Job {
+  id Int @id @default(autoincrement())
+  domaine String
+  title String
+  area String
+  description String
+  recrutor Recrutor @relation(fields: [recrutorId], references: [id])
+  recrutorId Int 
+}
+
+model Photo {
+  id String @default(cuid()) @id
+  url String
+  owner User?  @relation(fields: [ownerId], references: [id])
+  ownerId Int
+}
+
+
+model Post {
+  id Int @id @default(autoincrement())
+  illustration String
+  title String
+  content Json?
+  isPublished Boolean @default(false)
+  author User?  @relation(fields: [authorId], references: [id])
+  authorId Int
+}
